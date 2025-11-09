@@ -41,6 +41,26 @@ def roulette_wheel_selection(population: list[Individual]) -> Individual:
             return individual
     return population[-1]
 
+def ranking_selection(population: list[Individual]) -> Individual:
+    n = len(population)
+    sorted_population = sorted(population, key=lambda i: i.fitness, reverse=True)
+    chances = [(n - i) for i in range(n)]
+    total_chances = sum(chances)
+
+    if total_chances == 0:
+        return random.choice(population)
+    
+    pick = random.uniform(0, total_chances)
+    cumulative_sum = 0
+
+    for i, individual in enumerate(sorted_population):
+        cumulative_sum += chances[i]
+        if cumulative_sum >= pick:
+            return individual
+        
+    return sorted_population[-1]
+
+
 # --- Crossovers ---
 
 def single_point_crossover(parent1: Individual, parent2: Individual) -> tuple[Individual, Individual]:
