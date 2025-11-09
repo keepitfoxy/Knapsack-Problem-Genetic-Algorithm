@@ -1,3 +1,4 @@
+import random
 from data_models import Individual, KnapsackProblem
 
 #  --- Funkcja Przystosowania (Wymaganie 3.5) ---
@@ -22,3 +23,20 @@ def calculate_fitness(individual: Individual, problem: KnapsackProblem) -> float
         
     individual.total_weight = total_weight
     return individual.fitness
+
+# --- Selekcje ---
+
+def roulette_wheel_selection(population: list[Individual]) -> Individual:
+    """Roulette Wheel Selection (Wymaganie 3.5)."""
+    sum_fitness = sum(i.fitness for i in population)
+    if sum_fitness == 0:
+        return random.choice(population)
+    
+    pick = random.uniform(0, sum_fitness)
+    
+    cumulative_sum = 0
+    for individual in population:
+        cumulative_sum += individual.fitness
+        if cumulative_sum >= pick:
+            return individual
+    return population[-1]
