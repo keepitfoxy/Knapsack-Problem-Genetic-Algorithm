@@ -1,7 +1,7 @@
 import random
 from data_models import Individual, KnapsackProblem
 
-#  --- Funkcja Przystosowania (Wymaganie 3.5) ---
+#  --- Calculate fitness ---
 
 def calculate_fitness(individual: Individual, problem: KnapsackProblem) -> float:
     """
@@ -24,10 +24,10 @@ def calculate_fitness(individual: Individual, problem: KnapsackProblem) -> float
     individual.total_weight = total_weight
     return individual.fitness
 
-# --- Selekcje ---
+# --- Selections ---
 
 def roulette_wheel_selection(population: list[Individual]) -> Individual:
-    """Roulette Wheel Selection (Wymaganie 3.5)."""
+    """Roulette Wheel Selection"""
     sum_fitness = sum(i.fitness for i in population)
     if sum_fitness == 0:
         return random.choice(population)
@@ -40,3 +40,23 @@ def roulette_wheel_selection(population: list[Individual]) -> Individual:
         if cumulative_sum >= pick:
             return individual
     return population[-1]
+
+# --- Crossovers ---
+
+def single_point_crossover(parent1: Individual, parent2: Individual) -> tuple[Individual, Individual]:
+    """Single-Point Crossover"""
+    length = len(parent1)
+    crossover_point = random.randint(1, length - 1)
+    
+    offspring_chromosome1 = parent1.chromosome[:crossover_point] + parent2.chromosome[crossover_point:]
+    offspring_chromosome2 = parent2.chromosome[:crossover_point] + parent1.chromosome[crossover_point:]
+    
+    return Individual(offspring_chromosome1), Individual(offspring_chromosome2)
+
+# --- Mutations ---
+
+def mutation(individual: Individual, mutation_probability: float) -> None:
+    """Mutation operator"""
+    for i in range(len(individual)):
+        if random.random() < mutation_probability:
+            individual.chromosome[i] = 1 - individual.chromosome[i]  # Flipping bit
