@@ -1,4 +1,12 @@
-from data_models import Item, KnapsackProblem
+from typing import Callable
+import random
+from data_models import Item, KnapsackProblem, generate_random_individual, Individual
+from operators import calculate_fitness, mutation
+
+FitnessFunc = Callable[[Individual, KnapsackProblem], float]
+SelectionFunc = Callable[[list[Individual]], Individual]
+CrossoverFunc = Callable[[Individual, Individual], tuple[Individual, Individual]]
+
 
 # --- Importing data ---
 
@@ -27,3 +35,65 @@ def import_data(file_name: str) -> KnapsackProblem:
     except Exception as e:
         print(f"Error loading data: {e}")
         return None
+    
+# --- Main Evolution Script ---
+
+def genetic_algorithm(
+    problem: KnapsackProblem,
+    population_size: int,
+    generations: int,
+    crossover_probability: float, 
+    mutation_probability: float,  
+    selection_func: SelectionFunc,
+    crossover_func: CrossoverFunc
+) -> tuple [Individual, list[float]]:
+    """
+    General script realizing the genetic algorithm evolution.
+    """
+    chromosome_length = problem.num_items
+    fitness_history = []
+
+    # Initial population
+    population = [generate_random_individual(chromosome_length) for _ in range(population_size)]
+
+    for gen in range(generations):
+
+        # Evaluate fitness
+        for individual in population:
+            calculate_fitness(individual, problem)
+
+        # Record best fitness
+        best_individual = max(population, key=lambda i: i.fitness)
+        fitness_history.append(best_individual.fitness)
+
+        # New generation
+        new_population = []
+
+        while len(new_population) < population_size:
+
+            # Selecting parents
+            parent1 = selection_func(population)
+            parent2 = selection_func(population)
+
+            # Crossover and mutation
+            if random.random() < crossover_probability:
+                offspring1, offspring2 = crossover_func(parent1, parent2)
+            else:
+                offspring1, offspring2 = Individual(parent1.chromosome[:]), Individual(parent2.chromosome[:])
+
+            mutation(offspring1, mutation_probability)
+            mutation(offspring2, mutation_probability)
+
+            # Add offspring to new population
+            new_population.append(offspring1)
+            if len(new_population) < population_size:
+                new_population.append(offspring2)
+
+        population = new_population
+    
+    # Final evaluation
+    for individual in population:
+        calculate_fitness(individual, problem)
+    final_best_individual = max(population, key=lambda i: i.fitness)
+
+    return final_best_individual, fitness_history
