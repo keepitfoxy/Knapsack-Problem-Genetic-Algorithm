@@ -1,5 +1,6 @@
+from data_models import Item, KnapsackProblem
 
-# --- Funkcja Importująca Dane (Przeniesiona z Kroku A.2, aby używać klas) ---
+# --- Importing data ---
 
 def import_data(file_name: str) -> KnapsackProblem:
     """
