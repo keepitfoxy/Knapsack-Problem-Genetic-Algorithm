@@ -26,6 +26,8 @@ def calculate_fitness(individual: Individual, problem: KnapsackProblem) -> float
 
 # --- Selections ---
 
+# --- Roulette wheel selection ---
+
 def roulette_wheel_selection(population: list[Individual]) -> Individual:
     """Roulette Wheel Selection"""
     sum_fitness = sum(i.fitness for i in population)
@@ -40,6 +42,25 @@ def roulette_wheel_selection(population: list[Individual]) -> Individual:
         if cumulative_sum >= pick:
             return individual
     return population[-1]
+
+# --- tournament selection ---
+
+def tournament_selection(population: list['Individual'], tournament_size: int = 3) -> 'Individual':
+    """
+    Default tournament size k=3
+    """
+ 
+    if tournament_size > len(population):
+        tournament_size = len(population) # Używamy całej populacji
+        
+    tournament = random.sample(population, tournament_size)
+    
+    # best fit
+    winner = max(tournament, key=lambda i: i.fitness)
+    
+    return winner
+
+# --- ranking selection ---
 
 def ranking_selection(population: list[Individual]) -> Individual:
     n = len(population)
