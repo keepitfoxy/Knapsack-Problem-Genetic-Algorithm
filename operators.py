@@ -61,7 +61,7 @@ def ranking_selection(population: list[Individual]) -> Individual:
     return sorted_population[-1]
 
 
-# --- Crossovers ---
+# --- Single point Crossovers ---
 
 def single_point_crossover(parent1: Individual, parent2: Individual) -> tuple[Individual, Individual]:
     """Single-Point Crossover"""
@@ -70,6 +70,31 @@ def single_point_crossover(parent1: Individual, parent2: Individual) -> tuple[In
     
     offspring_chromosome1 = parent1.chromosome[:crossover_point] + parent2.chromosome[crossover_point:]
     offspring_chromosome2 = parent2.chromosome[:crossover_point] + parent1.chromosome[crossover_point:]
+    
+    return Individual(offspring_chromosome1), Individual(offspring_chromosome2)
+
+# --- Two point Crossovers ---
+
+def two_point_crossover(parent1: 'Individual', parent2: 'Individual') -> tuple['Individual', 'Individual']:
+    length = len(parent1)
+    
+    # picking two different random points
+    crossover_points = sorted(random.sample(range(1, length), 2))
+    point1, point2 = crossover_points[0], crossover_points[1]
+
+    # descendant 1
+    offspring_chromosome1 = (
+        parent1.chromosome[:point1] + 
+        parent2.chromosome[point1:point2] + 
+        parent1.chromosome[point2:]
+    )
+    
+    # descendant 2
+    offspring_chromosome2 = (
+        parent2.chromosome[:point1] + 
+        parent1.chromosome[point1:point2] + 
+        parent2.chromosome[point2:]
+    )
     
     return Individual(offspring_chromosome1), Individual(offspring_chromosome2)
 
