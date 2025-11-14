@@ -8,34 +8,65 @@ SelectionFunc = Callable[[list[Individual]], Individual]
 CrossoverFunc = Callable[[Individual, Individual], tuple[Individual, Individual]]
 
 
-# --- Importing data ---
+
 
 def import_data(file_name: str) -> KnapsackProblem:
-    """
-    Imports Knapsack problem data from a text file.
-    """
+   
     try:
         with open(file_name, 'r') as f:
-            lines = f.readlines()
+            lines = [line.strip() for line in f.readlines() if line.strip()]
             
-            problem_size = int(lines[0].strip()) 
-            values = [int(v) for v in lines[1].split()]
-            capacity = int(lines[2].strip())
-            weights = [int(w) for w in lines[3].split()]
-            
-            if len(values) != len(weights):
-                raise ValueError("Inconsistent number of values and weights.")
-            
-            items = []
-            for i in range(len(values)):
-                items.append(Item(i + 1, values[i], weights[i]))
-                
-            return KnapsackProblem(capacity, items)
+            if not lines:
+                raise ValueError("Plik jest pusty.")
 
+            first_line_parts = lines[0].split()
+
+            if len(first_line_parts) == 2:
+                try:
+                    problem_size = int(first_line_parts[0])
+                    capacity = int(first_line_parts[1])
+                    
+                    items = []
+                    for i, line in enumerate(lines[1:]):
+                        parts = line.split()
+                        if len(parts) == 2:
+                            value = int(parts[0])
+                            weight = int(parts[1])
+                            items.append(Item(i + 1, value, weight))
+                        else:
+                            raise ValueError(f"Błędny format linii przedmiotu: {line}")
+                        
+                    if len(items) != problem_size:
+                        raise ValueError(f"Plik deklaruje {problem_size} przedmiotów, a znaleziono {len(items)}.")
+                    return KnapsackProblem(capacity, items)
+                except (ValueError, IndexError):
+                    pass 
+
+            if len(lines) >= 4:
+                try:
+                    problem_size = int(lines[0])
+                    values = [int(v) for v in lines[1].split()]
+                    capacity = int(lines[2])
+                    weights = [int(w) for v in lines[3].split()]
+                    
+                    if len(values) != problem_size or len(weights) != problem_size:
+                        raise ValueError("Niezgodna liczba przedmiotów, wartości lub wag.")
+                    
+                    items = []
+                    for i in range(problem_size):
+                        items.append(Item(i + 1, values[i], weights[i]))
+                    return KnapsackProblem(capacity, items)
+                except (ValueError, IndexError) as e:
+                    raise ValueError(f"Nie udało się wczytać jako format 2: {e}")
+
+            raise ValueError(f"Nie udało się sparsować pliku {file_name}. Nieznany format.")
     except Exception as e:
-        print(f"Error loading data: {e}")
+        print(f"Error loading data from {file_name}: {e}")
         return None
     
+
+
+
 # --- Main Evolution Script ---
 
 def genetic_algorithm(
@@ -47,9 +78,6 @@ def genetic_algorithm(
     selection_func: SelectionFunc,
     crossover_func: CrossoverFunc
 ) -> tuple [Individual, list[float]]:
-    """
-    General script realizing the genetic algorithm evolution.
-    """
     chromosome_length = problem.num_items
     fitness_history = []
 

@@ -1,6 +1,10 @@
 import random
 from data_models import Individual, KnapsackProblem
 
+
+
+
+
 #  --- Calculate fitness ---
 
 def calculate_fitness(individual: Individual, problem: KnapsackProblem) -> float:
@@ -24,6 +28,10 @@ def calculate_fitness(individual: Individual, problem: KnapsackProblem) -> float
     individual.total_weight = total_weight
     return individual.fitness
 
+
+
+
+
 # --- Selections ---
 
 # --- Roulette wheel selection ---
@@ -43,6 +51,10 @@ def roulette_wheel_selection(population: list[Individual]) -> Individual:
             return individual
     return population[-1]
 
+
+
+
+
 # --- tournament selection ---
 
 def tournament_selection(population: list['Individual'], tournament_size: int = 3) -> 'Individual':
@@ -59,6 +71,10 @@ def tournament_selection(population: list['Individual'], tournament_size: int = 
     winner = max(tournament, key=lambda i: i.fitness)
     
     return winner
+
+
+
+
 
 # --- ranking selection ---
 
@@ -82,6 +98,10 @@ def ranking_selection(population: list[Individual]) -> Individual:
     return sorted_population[-1]
 
 
+
+
+
+
 # --- Single point Crossovers ---
 
 def single_point_crossover(parent1: Individual, parent2: Individual) -> tuple[Individual, Individual]:
@@ -93,6 +113,11 @@ def single_point_crossover(parent1: Individual, parent2: Individual) -> tuple[In
     offspring_chromosome2 = parent2.chromosome[:crossover_point] + parent1.chromosome[crossover_point:]
     
     return Individual(offspring_chromosome1), Individual(offspring_chromosome2)
+
+
+
+
+
 
 # --- Two point Crossovers ---
 
@@ -118,6 +143,11 @@ def two_point_crossover(parent1: 'Individual', parent2: 'Individual') -> tuple['
     )
     
     return Individual(offspring_chromosome1), Individual(offspring_chromosome2)
+
+
+
+
+
 
 # --- Mutations ---
 

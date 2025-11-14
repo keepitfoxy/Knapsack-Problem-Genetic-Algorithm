@@ -4,22 +4,21 @@ from ga_core import genetic_algorithm, import_data
 from operators import * 
 from data_models import KnapsackProblem, Individual
 
+
+
+
+
 def run_and_collect_results(
     problem_data: KnapsackProblem, 
     scenarios: list
 ) -> list[dict]:
-    """
-    Runs multiple GA scenarios and collects fitness history for reporting.
-    
-    :param problem_data: Knapsack problem instance.
-    :param scenarios: List of dictionaries defining GA configuration.
-    :return: List of dictionaries with scenario results and fitness history.
-    """
     
     results = []
     
-    print("\n--- STARTING EXPERIMENT ---")
-    
+    print(f"=========================================================")
+    print("================ STARTING EXPERIMENT =====================")
+    print(f"=========================================================")
+
     for scenario in scenarios:
         
         # run the GA, using a deep copy of the problem data
@@ -45,13 +44,12 @@ def run_and_collect_results(
 
     return results
 
+
+
+
+
+
 def report_results_and_plot(experiment_name: str, results: list[dict]):
-    """
-    Prints key final results and generates the fitness history plot using Matplotlib.
-    
-    :param experiment_name: Title of the experiment/plot.
-    :param results: Data collected from run_and_collect_results.
-    """
     
     # final results table (console)
     print(f"\n--- EXPERIMENT REPORT: {experiment_name} ---")
