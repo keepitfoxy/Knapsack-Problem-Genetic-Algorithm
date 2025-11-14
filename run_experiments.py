@@ -28,9 +28,9 @@ def run_experiments_comparisons(data_file_name: str, scenarios: list, experiment
         print(f"Pominięto eksperyment dla {data_file_name}: Nie udało się przeprowadzić ewolucji algorytmu.")
         return
     
-    print(f"\n=======================================================")
-    print(f"--- URUCHAMIANIE EWOLUCJI ALGORYTMU {experiment_title} dla {data_file_name} ---")
-    print(f"=========================================================")
+    print(f"\n============================================================================")
+    print(f"===URUCHAMIANIE EWOLUCJI ALGORYTMU {experiment_title} dla {data_file_name} ===")
+    print(f"==============================================================================")
     results = run_and_collect_results(problem, scenarios)
     report_results_and_plot(f"{experiment_title} \n(Plik: {data_file_name})", results)
 
