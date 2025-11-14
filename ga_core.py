@@ -47,7 +47,7 @@ def import_data(file_name: str) -> KnapsackProblem:
                     problem_size = int(lines[0])
                     values = [int(v) for v in lines[1].split()]
                     capacity = int(lines[2])
-                    weights = [int(w) for v in lines[3].split()]
+                    weights = [int(v) for v in lines[3].split()]
                     
                     if len(values) != problem_size or len(weights) != problem_size:
                         raise ValueError("Niezgodna liczba przedmiotów, wartości lub wag.")
