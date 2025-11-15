@@ -19,20 +19,36 @@ from main_experiment import run_and_collect_results, report_results_and_plot
 
 
 
+def get_optimum_value(problem_file_path: str) -> int | None:
+    if "/low-dimensional/" in problem_file_path:
+        optimum_path = problem_file_path.replace("/low-dimensional/", "/low-dimensional-optimum/")
+    elif "/large_scale/" in problem_file_path:
+        optimum_path = problem_file_path.replace("/large_scale/", "/large_scale-optimum/")
+    else:
+        return None 
+
+    try:
+        with open(optimum_path, 'r') as f:
+            content = f.read().strip()
+            return int(content)
+    except (FileNotFoundError, ValueError, IsADirectoryError):
+        print(f"Ostrzeżenie: Nie udało się wczytać optimum z pliku: {optimum_path}")
+        return None
 
 
 
-def run_experiments_comparisons(data_file_name: str, scenarios: list, experiment_title: str):
+
+def run_experiments_comparisons(data_file_name: str, scenarios: list, experiment_title: str, optimum_val: int | None):
     problem = import_data(data_file_name) 
     if problem is None:
         print(f"Pominięto eksperyment dla {data_file_name}: Nie udało się przeprowadzić ewolucji algorytmu.")
         return
-    
+
     print(f"\n============================================================================")
     print(f"===URUCHAMIANIE EWOLUCJI ALGORYTMU {experiment_title} dla {data_file_name} ===")
     print(f"==============================================================================")
     results = run_and_collect_results(problem, scenarios)
-    report_results_and_plot(f"{experiment_title} \n(Plik: {data_file_name})", results)
+    report_results_and_plot(f"{experiment_title} \n(Plik: {data_file_name})", results, optimum_val)
 
 
 
@@ -159,32 +175,36 @@ if __name__ == "__main__":
 
 
 
-
-
 # --- Pętla ---
 
-    for filename in DATA_FILES:
-        print(f"\n=======================================================")
-        print(f"=== Rozpoczynam przetwarzanie zbioru: {filename} ========")
-        print(f"=========================================================")
-        
-        
-        run_experiments_comparisons(filename, scenarios_rates, 
-                                  experiment_title="Ocena 3.5: Różne współczynniki mutacji i krzyżowania")
-        
-        
-        run_experiments_comparisons(filename, scenarios_selection_4_5, 
-                                  experiment_title="Ocena 4.5: Selekcja Ruletkowa vs Rankingowa")
-        
-        
-        run_experiments_comparisons(filename, scenarios_crossover_4_5, 
-                                  experiment_title="Ocena 4.5: Single vs Two piont crossover")
-        
-        
-        run_experiments_comparisons(filename, scenarios_selection_5_0, 
-                                  experiment_title="Ocena 5.0: Porównanie Selekcji (Ruletka, Ranking, Turniej)")
-        
+for filename in DATA_FILES:
+    print(f"\n=======================================================")
+    print(f"=== Rozpoczynam przetwarzanie zbioru: {filename} ========")
+    print(f"=========================================================")
+    
+# --- Optimum ---
+    optimum = get_optimum_value(filename)
+    
+    
+# --- OCENA 3.5 ---
+    run_experiments_comparisons(filename, scenarios_rates, 
+                                experiment_title="Ocena 3.5: Różne współczynniki mutacji i krzyżowania",
+                                optimum_val=optimum) 
+    
+    
+# --- OCENA 4.5 ---
+    combined_scenarios_4_5 = scenarios_selection_4_5 + scenarios_crossover_4_5
+    run_experiments_comparisons(filename, combined_scenarios_4_5, 
+                                experiment_title="Ocena 4.5: Porównanie Selekcji i Krzyżowania",
+                                optimum_val=optimum)
+    
+    
+# --- OCENA 5.0 ---
+    run_experiments_comparisons(filename, scenarios_selection_5_0, 
+                                experiment_title="Ocena 5.0: Porównanie Selekcji (Ruletka, Ranking, Turniej)",
+                                optimum_val=optimum)
+    
 
-        print(f"\n=======================================================")
-        print(f"--- URUCHAMIANIE EWOLUCJI ALGORYTMU ZAKOŃCZONE ---")
-        print(f"=========================================================")
+    print(f"\n=======================================================")
+    print(f"--- URUCHAMIANIE EWOLUCJI ALGORYTMU ZAKOŃCZONE ---")
+    print(f"=========================================================")

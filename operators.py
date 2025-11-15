@@ -155,4 +155,31 @@ def mutation(individual: Individual, mutation_probability: float) -> None:
     """Mutation operator"""
     for i in range(len(individual)):
         if random.random() < mutation_probability:
-            individual.chromosome[i] = 1 - individual.chromosome[i]  # Flipping bit
+            individual.chromosome[i] = 1 - individual.chromosome[i] 
+
+
+
+# --- Naprawia osobnika, jeśli jego waga przekracza pojemność plecaka ---
+
+def repair_individual(individual: Individual, problem: KnapsackProblem):
+    
+# --- Oblicza aktualną wagę i znajduje indeksy wziętych przedmiotów ---
+    current_weight = 0
+    items_in_knapsack_indices = []
+    
+    for i, gene in enumerate(individual.chromosome):
+        if gene == 1:
+            current_weight += problem.items[i].weight
+            items_in_knapsack_indices.append(i)
+            
+# --- Jeśli waga jest w porządku, nie rób nic ---
+    if current_weight <= problem.capacity:
+        return
+
+# --- Jeśli waga jest za duża, naprawiaj w pętli ---
+    random.shuffle(items_in_knapsack_indices)
+    
+    while current_weight > problem.capacity and items_in_knapsack_indices:
+        idx_to_remove = items_in_knapsack_indices.pop()
+        individual.chromosome[idx_to_remove] = 0
+        current_weight -= problem.items[idx_to_remove].weight

@@ -1,7 +1,8 @@
 from typing import Callable
 import random
 from data_models import Item, KnapsackProblem, generate_random_individual, Individual
-from operators import calculate_fitness, mutation
+from operators import calculate_fitness, mutation, repair_individual
+
 
 FitnessFunc = Callable[[Individual, KnapsackProblem], float]
 SelectionFunc = Callable[[list[Individual]], Individual]
@@ -23,15 +24,15 @@ def import_data(file_name: str) -> KnapsackProblem:
 
             if len(first_line_parts) == 2:
                 try:
-                    problem_size = int(first_line_parts[0])
-                    capacity = int(first_line_parts[1])
+                    problem_size = float(first_line_parts[0])
+                    capacity = float(first_line_parts[1])
                     
                     items = []
                     for i, line in enumerate(lines[1:]):
                         parts = line.split()
                         if len(parts) == 2:
-                            value = int(parts[0])
-                            weight = int(parts[1])
+                            value = float(parts[0])
+                            weight = float(parts[1])
                             items.append(Item(i + 1, value, weight))
                         else:
                             raise ValueError(f"Błędny format linii przedmiotu: {line}")
@@ -63,7 +64,6 @@ def import_data(file_name: str) -> KnapsackProblem:
     except Exception as e:
         print(f"Error loading data from {file_name}: {e}")
         return None
-    
 
 
 
@@ -76,50 +76,40 @@ def genetic_algorithm(
     crossover_probability: float, 
     mutation_probability: float,  
     selection_func: SelectionFunc,
-    crossover_func: CrossoverFunc
+    crossover_func: CrossoverFunc,
+    initial_inclusion_prob: float = 0.5 
 ) -> tuple [Individual, list[float]]:
+    
     chromosome_length = problem.num_items
     fitness_history = []
-
-    # Initial population
-    population = [generate_random_individual(chromosome_length) for _ in range(population_size)]
+    population = [generate_random_individual(chromosome_length, initial_inclusion_prob) 
+                  for _ in range(population_size)]
 
     for gen in range(generations):
-
-        # Evaluate fitness
+        
         for individual in population:
             calculate_fitness(individual, problem)
-
-        # Record best fitness
         best_individual = max(population, key=lambda i: i.fitness)
         fitness_history.append(best_individual.fitness)
-
-        # New generation
         new_population = []
 
         while len(new_population) < population_size:
-
-            # Selecting parents
             parent1 = selection_func(population)
             parent2 = selection_func(population)
-
-            # Crossover and mutation
             if random.random() < crossover_probability:
                 offspring1, offspring2 = crossover_func(parent1, parent2)
             else:
                 offspring1, offspring2 = Individual(parent1.chromosome[:]), Individual(parent2.chromosome[:])
-
             mutation(offspring1, mutation_probability)
             mutation(offspring2, mutation_probability)
-
-            # Add offspring to new population
+            repair_individual(offspring1, problem)
+            repair_individual(offspring2, problem)
             new_population.append(offspring1)
+
             if len(new_population) < population_size:
                 new_population.append(offspring2)
-
         population = new_population
     
-    # Final evaluation
     for individual in population:
         calculate_fitness(individual, problem)
     final_best_individual = max(population, key=lambda i: i.fitness)
