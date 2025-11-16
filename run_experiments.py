@@ -20,10 +20,10 @@ from main_experiment import run_and_collect_results, report_results_and_plot
 
 
 def get_optimum_value(problem_file_path: str) -> int | None:
-    if "/low-dimensional/" in problem_file_path:
-        optimum_path = problem_file_path.replace("/low-dimensional/", "/low-dimensional-optimum/")
-    elif "/large_scale/" in problem_file_path:
-        optimum_path = problem_file_path.replace("/large_scale/", "/large_scale-optimum/")
+    if "low-dimensional" in problem_file_path:
+        optimum_path = problem_file_path.replace("low-dimensional", "low-dimensional-optimum")
+    elif "large_scale" in problem_file_path:
+        optimum_path = problem_file_path.replace("large_scale", "large_scale-optimum")
     else:
         return None 
 
@@ -68,8 +68,8 @@ if __name__ == "__main__":
 
 # --- Dane large dimensional ---
 
-    "dane AG/large_scale/knapPI_1_1000_1000_1",
-    "dane AG/large_scale/knapPI_1_2000_1000_1"
+    "dane AG/large_scale/knapPI_1_5000_1000_1",
+    "dane AG/large_scale/knapPI_2_1000_1000_1"
     ]
     
     BASE_PARAMS = {

@@ -53,9 +53,6 @@ def report_results_and_plot(experiment_name: str, results: list[dict], optimum_v
     for r in results:
         print(f"| {r['label']:<40} | {r['final_fitness']:<15.2f} | {r['final_weight']:<10} |")
 
-
-    import matplotlib.pyplot as plt
-
     plt.figure(figsize=(12, 7))
 
     for r in results:
@@ -64,10 +61,11 @@ def report_results_and_plot(experiment_name: str, results: list[dict], optimum_v
     
     if optimum_value is not None:
         plt.axhline(y=optimum_value, color='green', linestyle='--', label=f'Optimum ({optimum_value})')
-        plt.title(experiment_name)
-        plt.xlabel("Iteration")
-        plt.ylabel("Best Fitness Value")
-        plt.legend()
-        plt.grid(True, linestyle='--')
-        plt.tight_layout()
-        plt.show()
+        
+    plt.title(experiment_name)
+    plt.xlabel("Iteration")
+    plt.ylabel("Best Fitness Value")
+    plt.legend()
+    plt.grid(True, linestyle='--')
+    plt.tight_layout()
+    plt.show()
